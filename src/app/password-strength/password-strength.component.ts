@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { PasswordServiceService } from '../password-service/password-service.service';
 
 @Component({
   selector: 'app-password-strength',
@@ -6,31 +7,27 @@ import { Component } from '@angular/core';
   styleUrls: ['./password-strength.component.css']
 })
 export class PasswordStrengthComponent {
-  password: string = '';
+  password = '';
+  dataFromServiceMediumPass: boolean;
+  dataFromServiceStrongPass: boolean;
 
-
-  isEasyPassword(): boolean {
-    return /^[a-zA-Z0-9]+$/.test(this.password);
+  constructor(private passwordService: PasswordServiceService) {
+    this.password = this.passwordService.getPassword();
+    this.dataFromServiceMediumPass = this.passwordService.isMediumPassword(); 
+    this.dataFromServiceStrongPass = this.passwordService.isStrongPassword(); 
+    this.calculateStrength();
   }
-
-  isMediumPassword(): boolean {
-    return /^(?=.*[a-zA-Z])(?=.*[0-9])|(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9])|(?=.*[0-9])(?=.*[^a-zA-Z0-9])/.test(this.password);
-  }
-
-  isStrongPassword(): boolean {
-    return /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[^a-zA-Z0-9])/.test(this.password);
-    
-  }
-
  
 
   calculateStrength(): void {
-    // method called whenever the password changes
+    this.passwordService.setPassword(this.password);
   }
 
   onPasswordChange(event: any): void {
     const inputElement = event.target as HTMLInputElement;
     this.password = inputElement.value;
+    this.dataFromServiceMediumPass = this.passwordService.isMediumPassword(); 
+    this.dataFromServiceStrongPass = this.passwordService.isStrongPassword();     
     this.calculateStrength();
   }
   
